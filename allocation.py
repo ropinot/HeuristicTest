@@ -1,4 +1,5 @@
 from scipy.stats import truncnorm
+from MCIntegrals import f3TruncNormRVSnp
 import pandas as pd
 
 df = pd.read_excel('ex_6_optimal_results.xlsx')
@@ -37,6 +38,7 @@ parameters = {'Q1': 1.,
 
 
 for index, row in df.iterrows():
+    print "Elaborating index {}".format(index)
     # read parameters from the excel file
     parameters['mu1'] = row['MU1']
     parameters['mu2'] = row['MU2']
@@ -70,22 +72,25 @@ for index, row in df.iterrows():
         for n, r in enumerate([rv1, rv2, rv3]):
             p = 1 - r.cdf(Q[n]+1)
             l[n] = p
-            print "n: {}   p: {}".format(n,p)
+            # print "n: {}   p: {}".format(n,p)
             if p > best_probability:
                 best_probability = p
                 best_retailer = n
 
-        print "Best retailer: {} with value {}".format(best_retailer, best_probability)
+        # print "Best retailer: {} with value {}".format(best_retailer, best_probability)
         Q[best_retailer] += 1
         A -= 1
-        print "Current allocation: {}".format(Q)
+        # print "Current allocation: {}".format(Q)
         log.append(l)
 
-    print "best allocation:"
-    print Q
-    df.ix[index, 'ALLOC_HEU'] = Q
+    # print "best allocation:"
+    # print Q
+    parameters['Q1'] = Q[0]
+    parameters['Q2'] = Q[1]
+    parameters['Q3'] = Q[2]
 
-    # df.ix[index, 'HEURISTIC_VALUE']
+    df.ix[index, 'ALLOC_HEU'] = str(Q.values())
+    df.ix[index, 'HEURISTIC_VALUE'] = f3TruncNormRVSnp(parameters)
 
 
-
+df.to_excel('ex_6_with_heuristics_results.xlsx')
