@@ -173,5 +173,11 @@ if __name__ == "__main__":
         elif N == 9:
             row['HEU_VALUE'] = f9TruncNormRVSnp(parameters)
 
+        if row['HEU_VALUE'] > row['MINP']:
+            print "----- BETTER THAN TO DOWNHILL SOLUTION -----"
+        elif row['HEU_VALUE'] <= row['MINP']:
+            print "+++++ WORSE THAN DOWNHILL SOLUTION +++++"
+        else:
+            print "===== WORSE THAN DOWNHILL SOLUTION ====="
 
     df.to_excel('Dati_random_with_heuristics_results.xlsx')
