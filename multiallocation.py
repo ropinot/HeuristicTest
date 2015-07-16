@@ -176,8 +176,7 @@ if __name__ == "__main__":
             df.ix[index, 'HEU_VALUE'] = f9TruncNormRVSnp(parameters)
 
         df.ix[index, 'HEU_ALLOC'] = str([parameters['Q{}'.format(i+1)] for i in xrange(N)]).replace(',', ' /').replace('.', ',')
-        print df
-        exit(1)
+
         # if row['HEU_VALUE'] > row['MINP']:
         #     print "----- BETTER THAN TO DOWNHILL SOLUTION -----"
         # elif row['HEU_VALUE'] <= row['MINP']:
