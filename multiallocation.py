@@ -3,15 +3,15 @@ from MCIntegrals import *
 import pandas as pd
 import re
 
-parameters = {'Q1': 1.,
-              'Q2': 1.,
-              'Q3': 1.,
-              'Q4': 1.,
-              'Q5': 1.,
-              'Q6': 1.,
-              'Q7': 1.,
-              'Q8': 1.,
-              'Q9': 1.,
+parameters = {'Q1': -1.0,
+              'Q2': -1.0,
+              'Q3': -1.0,
+              'Q4': -1.0,
+              'Q5': -1.0,
+              'Q6': -1.0,
+              'Q7': -1.0,
+              'Q8': -1.0,
+              'Q9': -1.0,
               'mu1': 0.0,
               'mu2': 0.0,
               'mu3': 0.0,
@@ -100,6 +100,7 @@ if __name__ == "__main__":
 
     df = pd.read_excel('Dati_random.xlsx')
     df['HEU_VALUE'] = 0.0
+    df['HEU_ALLOC'] = 'X'
 
     for index, row in df.iterrows():
         print "Elaborating index {}".format(index)
@@ -173,11 +174,13 @@ if __name__ == "__main__":
         elif N == 9:
             row['HEU_VALUE'] = f9TruncNormRVSnp(parameters)
 
-        if row['HEU_VALUE'] > row['MINP']:
-            print "----- BETTER THAN TO DOWNHILL SOLUTION -----"
-        elif row['HEU_VALUE'] <= row['MINP']:
-            print "+++++ WORSE THAN DOWNHILL SOLUTION +++++"
-        else:
-            print "===== WORSE THAN DOWNHILL SOLUTION ====="
+        row['HEU_ALLOC'] = str([parameters['Q{}'.format(i)] for i in xrange(N)])
+
+        # if row['HEU_VALUE'] > row['MINP']:
+        #     print "----- BETTER THAN TO DOWNHILL SOLUTION -----"
+        # elif row['HEU_VALUE'] <= row['MINP']:
+        #     print "+++++ WORSE THAN DOWNHILL SOLUTION +++++"
+        # else:
+        #     print "===== WORSE THAN DOWNHILL SOLUTION ====="
 
     df.to_excel('Dati_random_with_heuristics_results.xlsx')
