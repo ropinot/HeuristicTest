@@ -166,21 +166,24 @@ if __name__ == "__main__":
         for i in xrange(N):
             parameters['Q{}'.format(i+1)] = Q[i]
 
+        print "Best allocation: {}".format(str(Q))
         # evaluate the real probability
         if N == 3:
-            row['HEU_VALUE'] = f3TruncNormRVSnp(parameters)
+            df.ix[index, 'HEU_VALUE'] = f3TruncNormRVSnp(parameters)
         elif N == 6:
-            row['HEU_VALUE'] = f6TruncNormRVSnp(parameters)
+            df.ix[index, 'HEU_VALUE'] = f6TruncNormRVSnp(parameters)
         elif N == 9:
-            row['HEU_VALUE'] = f9TruncNormRVSnp(parameters)
+            df.ix[index, 'HEU_VALUE'] = f9TruncNormRVSnp(parameters)
 
-        row['HEU_ALLOC'] = str([parameters['Q{}'.format(i)] for i in xrange(N)])
-
+        df.ix[index, 'HEU_ALLOC'] = str([parameters['Q{}'.format(i+1)] for i in xrange(N)]).replace(',', ' /').replace('.', ',')
+        print df
+        exit(1)
         # if row['HEU_VALUE'] > row['MINP']:
         #     print "----- BETTER THAN TO DOWNHILL SOLUTION -----"
         # elif row['HEU_VALUE'] <= row['MINP']:
         #     print "+++++ WORSE THAN DOWNHILL SOLUTION +++++"
         # else:
         #     print "===== WORSE THAN DOWNHILL SOLUTION ====="
-
+    print "Writing results on file..."
     df.to_excel('Dati_random_with_heuristics_results.xlsx')
+    print "...done!"
