@@ -39,15 +39,15 @@ parameters = {'Q1': -1.0,
               'min_intrv7': 0.,
               'min_intrv8': 0.,
               'min_intrv9': 0.,
-              'max_intrv1': 100.,
-              'max_intrv2': 100.,
-              'max_intrv3': 100.,
-              'max_intrv4': 100.,
-              'max_intrv5': 100.,
-              'max_intrv6': 100.,
-              'max_intrv7': 100.,
-              'max_intrv8': 100.,
-              'max_intrv9': 100.,
+              'max_intrv1': 1000.,
+              'max_intrv2': 1000.,
+              'max_intrv3': 1000.,
+              'max_intrv4': 1000.,
+              'max_intrv5': 1000.,
+              'max_intrv6': 1000.,
+              'max_intrv7': 1000.,
+              'max_intrv8': 1000.,
+              'max_intrv9': 1000.,
               'target': 104.,
               'alpha': 0.5,
               'A': 130.,
@@ -98,7 +98,8 @@ def split_data(data):
 
 if __name__ == "__main__":
 
-    df = pd.read_excel('Dati_random.xlsx')
+    # df = pd.read_excel('Dati_random.xlsx')
+    df = pd.read_excel('Test_variazione_target.xlsx')
     df['HEU_VALUE'] = 0.0
     df['HEU_ALLOC'] = 'X'
 
@@ -109,7 +110,7 @@ if __name__ == "__main__":
         parameters['target'] = row['T']
         parameters['A'] = row['A']
         A = parameters['A']
-        Q = {i:0 for i in xrange(N)}
+        Q = {i: 0 for i in xrange(N)}
         log = []
 
         # get the mu and sigma from the excel (get a list [mu1, sigma1, mu2, sigma2,...] )
@@ -122,7 +123,15 @@ if __name__ == "__main__":
             parameters['sigma{}'.format(i+1)] = demand_params[j+1]
             j += 2
 
-
+        print "Now testing:"
+        for i in xrange(N):
+            print "R{}: mu: {}    sigma: {}".format(i+1,
+                                                    parameters['mu{}'.format(i+1)],
+                                                    parameters['sigma{}'.format(i+1)]
+                                                    )
+        print "with A: {}   T: {}".format(parameters['A'],
+                                          parameters['target'])
+        print "go..."
         # define the RVs
         rvs = []
         for i in xrange(N):
@@ -135,7 +144,6 @@ if __name__ == "__main__":
                                         b=parameters['max_intrv{}'.format(i+1)],
                                         mu=parameters['mu{}'.format(i+1)],
                                         sigma=parameters['sigma{}'.format(i+1)]))
-
         # Heuristic core
         while A > 0:
             best_probability = -1
@@ -166,6 +174,9 @@ if __name__ == "__main__":
         for i in xrange(N):
             parameters['Q{}'.format(i+1)] = Q[i]
 
+        if sum(Q.values()) != parameters['A']:
+            print "XXXXXXX ERROR: {}".format(sum(Q.values()))
+
         print "Best allocation: {}".format(str(Q))
         # evaluate the real probability
         if N == 3:
@@ -184,5 +195,5 @@ if __name__ == "__main__":
         # else:
         #     print "===== WORSE THAN DOWNHILL SOLUTION ====="
     print "Writing results on file..."
-    df.to_excel('Dati_random_with_heuristics_results.xlsx')
+    df.to_excel('Test_variazione_target.xlsx')
     print "...done!"
