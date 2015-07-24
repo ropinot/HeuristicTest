@@ -54,7 +54,7 @@ parameters = {'Q1': 38.0,
               'scaling': False,
               }
 
-
+@jit(nopython=True)
 def MIN(a, b):
         return a if a <= b else b
 
