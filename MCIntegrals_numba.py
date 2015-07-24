@@ -97,6 +97,7 @@ def f3TruncNormRVSnp(parameters):
         Q2 = parameters['Q2']
         Q3 = parameters['Q3']
 
+    # call the compiled function that perform the calculation loop
     return _f3(rv1, rv2, rv3, Q1, Q2, Q3, target, N)
 
 
@@ -114,6 +115,7 @@ def _f3(rv1, rv2, rv3, Q1, Q2, Q3, target, N):
 
 
 # def f3TruncNormRVSnp(parameters):
+    # This version does not use the numba function _f3
 #     N = parameters['N']
 #     target = parameters['target']
 #     rv1, rv2, rv3 = ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float)
