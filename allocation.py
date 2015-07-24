@@ -94,7 +94,8 @@ parameters = {'Q1': 1.,
               'maxiternochange': 30,
               'retailers': 3,
               'outfile': '',
-              'funcwrapper': None
+              'funcwrapper': None,
+              'numrun': 10
               }
 
 
