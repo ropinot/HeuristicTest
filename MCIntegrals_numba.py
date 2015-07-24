@@ -83,9 +83,10 @@ def f3TruncNormRVSnp(parameters):
 
     if parameters['scaling']:
         #scale the values of Qs in the allowed range such that sum(Q_i) = A
-        r = abs(parameters['Q1']) + abs(parameters['Q2']) + abs(parameters['Q3'])
+        r = ABS(parameters['Q1']) + ABS(parameters['Q2']) + ABS(parameters['Q3'])
         if r == 0.0:
             r = 1.
+
         # rounding the values, the sum could exceed A
         Q1 = trunc(ABS(parameters['Q1']) * parameters['A'] / r)
         Q2 = trunc(ABS(parameters['Q2']) * parameters['A'] / r)
