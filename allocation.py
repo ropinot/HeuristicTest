@@ -3,6 +3,44 @@ from MCIntegrals_numba import f3TruncNormRVSnp
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
 
+def greedy_allocation3(parameters):
+    """
+    Greedy heuristic for 3 supplier (the same as heu_allocation3 but with different parameters)
+    Does not write on the file but returns the solution
+    :param df: dataframe containing the data from the excel file
+    :param parameters: parameters dict
+    :return: write o the df and save on the file
+    """
+
+    rv1 = truncnorm_custom(parameters['min_intrv1'], parameters['max_intrv1'], parameters['mu1'], parameters['sigma1'])
+    rv2 = truncnorm_custom(parameters['min_intrv2'], parameters['max_intrv2'], parameters['mu2'], parameters['sigma2'])
+    rv3 = truncnorm_custom(parameters['min_intrv3'], parameters['max_intrv3'], parameters['mu3'], parameters['sigma3'])
+
+    A = parameters['A']
+    Q = {i: 0 for i in xrange(3)}
+
+    while A >= 0:
+        best_probability = -1
+        best_retailer = -1
+        for n, r in enumerate([rv1, rv2, rv3]):
+            p = 1 - r.cdf(Q[n]+1)
+            if p > best_probability:
+                best_probability = p
+                best_retailer = n
+
+        Q[best_retailer] += 1
+        A -= 1
+
+    parameters['Q1'] = Q[0]
+    parameters['Q2'] = Q[1]
+    parameters['Q3'] = Q[2]
+
+    return {'Q1': Q[0],
+            'Q2': Q[1],
+            'Q3': Q[2],
+            'PROB': f3TruncNormRVSnp(parameters)}
+
+
 def heu_allocation3(df, parameters):
     """
     Greedy heuristic for 3 supplier
