@@ -12,7 +12,7 @@ parameters['A'] = 2000
 parameters['N'] = 200000
 parameters['target'] = 1500.
 parameters['xtol'] = 1.
-parameters['ftol'] = 1.
+parameters['ftol'] = 0.1
 
 x = [random() for _ in xrange(3)]
 parameters['Q1'], parameters['Q2'], parameters['Q3'] = randint(100, 1000), randint(100, 1000), randint(100, 1000)
