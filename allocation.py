@@ -11,10 +11,20 @@ def greedy_allocation3(parameters):
     :param parameters: parameters dict
     :return: write o the df and save on the file
     """
-
-    rv1 = truncnorm_custom(parameters['min_intrv1'], parameters['max_intrv1'], parameters['mu1'], parameters['sigma1'])
-    rv2 = truncnorm_custom(parameters['min_intrv2'], parameters['max_intrv2'], parameters['mu2'], parameters['sigma2'])
-    rv3 = truncnorm_custom(parameters['min_intrv3'], parameters['max_intrv3'], parameters['mu3'], parameters['sigma3'])
+    if not parameters['distribution']:
+        print 'No distribution set...abort'
+        exit(1)
+    elif parameters['distribution'] == 'truncnorm':
+        rv1 = truncnorm_custom(parameters['min_intrv1'], parameters['max_intrv1'], parameters['mu1'], parameters['sigma1'])
+        rv2 = truncnorm_custom(parameters['min_intrv2'], parameters['max_intrv2'], parameters['mu2'], parameters['sigma2'])
+        rv3 = truncnorm_custom(parameters['min_intrv3'], parameters['max_intrv3'], parameters['mu3'], parameters['sigma3'])
+    elif parameters['distribution'] == 'norm':
+        rv1 = norm(parameters['mu1'], parameters['sigma1'])
+        rv2 = norm(parameters['mu2'], parameters['sigma2'])
+        rv3 = norm(parameters['mu3'], parameters['sigma3'])
+    else:
+        print 'Distribution not recognized...abort'
+        exit(1)
 
     A = parameters['A']
     Q = {i: 0 for i in xrange(3)}
@@ -133,7 +143,8 @@ parameters = {'Q1': 1.,
               'retailers': 3,
               'outfile': '',
               'funcwrapper': None,
-              'numrun': 10
+              'numrun': 10,
+              'distribution': None
               }
 
 

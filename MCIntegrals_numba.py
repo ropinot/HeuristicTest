@@ -81,13 +81,23 @@ def f3TruncNormRVSnp(parameters):
     #
     # pool = mp.Pool(ncpu)
     # workers = []
-
-    a1, b1 = (parameters['min_intrv1'] - parameters['mu1']) / parameters['sigma1'], (parameters['max_intrv1'] - parameters['mu1']) / parameters['sigma1']
-    a2, b2 = (parameters['min_intrv2'] - parameters['mu2']) / parameters['sigma2'], (parameters['max_intrv2'] - parameters['mu2']) / parameters['sigma2']
-    a3, b3 = (parameters['min_intrv3'] - parameters['mu3']) / parameters['sigma3'], (parameters['max_intrv3'] - parameters['mu3']) / parameters['sigma3']
-    rv1 = truncnorm(a1, b1, loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
-    rv2 = truncnorm(a2, b2, loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
-    rv3 = truncnorm(a3, b3, loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+    if not parameters['distribution']:
+        print 'No distribution set...abort'
+        exit(1)
+    elif parameters['ditribution'] == 'truncnorm':
+        a1, b1 = (parameters['min_intrv1'] - parameters['mu1']) / parameters['sigma1'], (parameters['max_intrv1'] - parameters['mu1']) / parameters['sigma1']
+        a2, b2 = (parameters['min_intrv2'] - parameters['mu2']) / parameters['sigma2'], (parameters['max_intrv2'] - parameters['mu2']) / parameters['sigma2']
+        a3, b3 = (parameters['min_intrv3'] - parameters['mu3']) / parameters['sigma3'], (parameters['max_intrv3'] - parameters['mu3']) / parameters['sigma3']
+        rv2 = truncnorm(a2, b2, loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv3 = truncnorm(a3, b3, loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+        rv1 = truncnorm(a1, b1, loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+    elif parameters['distribution'] == 'norm':
+        rv1 = norm(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv2 = norm(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+        rv3 = norm(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+    else:
+        print 'Distribution not recognized...abort'
+        exit(1)
 
     if parameters['scaling']:
         #scale the values of Qs in the allowed range such that sum(Q_i) = A
