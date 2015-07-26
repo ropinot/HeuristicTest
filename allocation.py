@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm
+from scipy.stats import truncnorm, norm
 from MCIntegrals_numba import f3TruncNormRVSnp
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
