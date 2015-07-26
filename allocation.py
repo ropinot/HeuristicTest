@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm, uniform
+from scipy.stats import truncnorm, norm, uniform, beta
 from MCIntegrals_numba import f3TruncNormRVSnp
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
@@ -26,6 +26,10 @@ def greedy_allocation3(parameters):
         rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2'])
         rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3'])
         rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1'])
+    elif parameters['distribution'] == 'beta':
+        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu2'], scale=parameters['sigma2'])
+        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu3'], scale=parameters['sigma3'])
+        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu1'], scale=parameters['sigma1'])
     else:
         print 'Distribution not recognized...abort'
         exit(1)
@@ -124,7 +128,7 @@ parameters = {'Q1': 1.,
               'sigma1': 15.,
               'sigma2': 35.,
               'sigma3': 7.5,
-              'min_intrv1': 0.,
+              'min_intrv1': 0., # for the beta ditribution, min_intrv=a, max_intrv=b
               'min_intrv2': 0.,
               'min_intrv3': 0.,
               'max_intrv1': 100.,

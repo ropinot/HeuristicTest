@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm, uniform
+from scipy.stats import truncnorm, norm, uniform, beta
 from numpy import ndarray, min
 from numba import jit
 from math import trunc
@@ -99,6 +99,10 @@ def f3TruncNormRVSnp(parameters):
         rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
         rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
         rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+    elif parameters['distribution'] == 'beta':
+        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu2'], scale=parameters['sigma2'])
+        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu3'], scale=parameters['sigma3'])
+        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu1'], scale=parameters['sigma1'])
     else:
         print 'Distribution not recognized...abort'
         exit(1)
