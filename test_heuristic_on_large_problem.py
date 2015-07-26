@@ -76,24 +76,26 @@ if __name__ == '__main__':
             # df_results.ix[index, 'ALLOC_HEU'] = str([result_heu['Q1'], result_heu['Q2'], result_heu['Q3']])
             # df_results.ix[index, 'HEURISTIC_VALUE'] = result_heu['PROB']
             # df_results.ix[index, 'HEURISTIC_TIME'] = heu_time
+
+            tot = sum(result_nm.x)
             df_run_result = pd.DataFrame([[row['DATASET'],
                                           3,
                                           parameters['A'],
                                           parameters['target'],
                                           parameters['mu1'],
-                                          parameters['mu2'],
-                                          parameters['mu3'],
                                           parameters['sigma1'],
+                                          parameters['mu2'],
                                           parameters['sigma2'],
+                                          parameters['mu3'],
                                           parameters['sigma3'],
                                           row['MAX_INTRV'],
                                           result_nm.fun,
                                           nm_time,
                                           result_nm.nit,
                                           result_nm.nfev,
-                                          result_nm.x[0],
-                                          result_nm.x[1],
-                                          result_nm.x[2],
+                                          result_nm.x[0]*parameters['A']/tot,
+                                          result_nm.x[1]*parameters['A']/tot,
+                                          result_nm.x[2]*parameters['A']/tot,
                                           str([result_heu['Q1'], result_heu['Q2'], result_heu['Q3']]),
                                           result_heu['PROB'],
                                           heu_time]], columns=df_results_columns)
