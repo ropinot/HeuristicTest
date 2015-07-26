@@ -25,7 +25,7 @@ if __name__ == '__main__':
     df = pd.read_excel('Data_alloc_change_on_target_change_comp_NM_large_problem_test.xlsx')
     df_results = pd.read_excel('Results_alloc_change_on_target_change_comp_NM_large_problem.xlsx')
 
-    df_results_columns = [u'DATASET', u'N', u'AVAIL', u'TARGET', u'MU1', u'S1', u'MU2', u'S2', u'MU3', u'S3', u'MAX_INTRV', u'NM_PROB', u'NM_TIME', u'NUM_ITER', u'FUN_EVAL', u'Q1', u'Q2', u'Q3', u'ALLOC_HEU', u'HEURISTIC_VALUE', u'HEURISTIC_TIME']
+    df_results_columns = [u'DATASET', u'N', u'DIST', u'AVAIL', u'TARGET', u'MU1', u'S1', u'MU2', u'S2', u'MU3', u'S3', u'MIN_INTRV', u'MAX_INTRV', u'NM_PROB', u'NM_TIME', u'NUM_ITER', u'FUN_EVAL', u'Q1', u'Q2', u'Q3', u'ALLOC_HEU', u'HEURISTIC_VALUE', u'HEURISTIC_TIME']
 
     for index, row in df.iterrows():
         # get from excel file
@@ -35,10 +35,12 @@ if __name__ == '__main__':
         parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = row['S1'],row['S2'],row['S3']
         parameters['A'] = row['AVAIL']
         parameters['target'] = row['TARGET']
+        parameters['min_intrv1'], parameters['min_intrv2'], parameters['min_intrv3'] = row['MIN_INTRV'], row['MIN_INTRV'], row['MIN_INTRV']
         parameters['max_intrv1'], parameters['max_intrv2'], parameters['max_intrv3'] = row['MAX_INTRV'], row['MAX_INTRV'], row['MAX_INTRV']
         parameters['dataset'] = row['DATASET']
 
         logging.debug('Start greedy heuristics')
+        logging.debug('Distribution: {}'.format(parameters['distribution']))
         start_time = time.time()
         result_heu = greedy_allocation3(parameters)
         end_time = time.time()
@@ -70,6 +72,7 @@ if __name__ == '__main__':
             tot = sum(result_nm.x)
             df_run_result = pd.DataFrame([[row['DATASET'],
                                           3,
+                                          parameters['distribution'],
                                           parameters['A'],
                                           parameters['target'],
                                           parameters['mu1'],
@@ -78,6 +81,7 @@ if __name__ == '__main__':
                                           parameters['sigma2'],
                                           parameters['mu3'],
                                           parameters['sigma3'],
+                                          row['MIN_INTRV'],
                                           row['MAX_INTRV'],
                                           result_nm.fun,
                                           nm_time,
