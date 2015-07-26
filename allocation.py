@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm
+from scipy.stats import truncnorm, norm, uniform
 from MCIntegrals_numba import f3TruncNormRVSnp
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
@@ -22,6 +22,10 @@ def greedy_allocation3(parameters):
         rv1 = norm(parameters['mu1'], parameters['sigma1'])
         rv2 = norm(parameters['mu2'], parameters['sigma2'])
         rv3 = norm(parameters['mu3'], parameters['sigma3'])
+    elif parameters['distribution'] == 'uniform':
+        rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2'])
+        rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3'])
+        rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1'])
     else:
         print 'Distribution not recognized...abort'
         exit(1)
@@ -114,7 +118,7 @@ def heu_allocation3(df, parameters):
 parameters = {'Q1': 1.,
               'Q2': 1.,
               'Q3': 1.,
-              'mu1': 30.,
+              'mu1': 30.,  # for the uniform ditribution, mu = a, mu+sigma=b
               'mu2': 70.,
               'mu3': 15.,
               'sigma1': 15.,

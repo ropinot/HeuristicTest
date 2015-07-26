@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm
+from scipy.stats import truncnorm, norm, uniform
 from numpy import ndarray, min
 from numba import jit
 from math import trunc
@@ -84,7 +84,7 @@ def f3TruncNormRVSnp(parameters):
     if not parameters['distribution']:
         print 'No distribution set...abort'
         exit(1)
-    elif parameters['ditribution'] == 'truncnorm':
+    elif parameters['distribution'] == 'truncnorm':
         a1, b1 = (parameters['min_intrv1'] - parameters['mu1']) / parameters['sigma1'], (parameters['max_intrv1'] - parameters['mu1']) / parameters['sigma1']
         a2, b2 = (parameters['min_intrv2'] - parameters['mu2']) / parameters['sigma2'], (parameters['max_intrv2'] - parameters['mu2']) / parameters['sigma2']
         a3, b3 = (parameters['min_intrv3'] - parameters['mu3']) / parameters['sigma3'], (parameters['max_intrv3'] - parameters['mu3']) / parameters['sigma3']
@@ -95,6 +95,10 @@ def f3TruncNormRVSnp(parameters):
         rv1 = norm(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
         rv2 = norm(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
         rv3 = norm(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+    elif parameters['distribution'] == 'uniform':
+        rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+        rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
     else:
         print 'Distribution not recognized...abort'
         exit(1)
