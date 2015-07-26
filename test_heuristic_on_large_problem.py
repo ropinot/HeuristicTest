@@ -95,6 +95,7 @@ if __name__ == '__main__':
                                           heu_time]], columns=df_results_columns)
 
             df_results=df_results.append(df_run_result, ignore_index=True)
+            df_results=df_results[df_results_columns]
 
     logging.debug('Write on disk')
     df_results.to_excel('Results.xlsx')
