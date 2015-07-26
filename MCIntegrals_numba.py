@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm
+from scipy.stats import truncnorm, norm
 from numpy import ndarray, min
 from numba import jit
 from math import trunc

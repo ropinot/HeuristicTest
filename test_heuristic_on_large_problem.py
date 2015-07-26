@@ -4,6 +4,7 @@ import pandas as pd
 from truncnorm_custom import truncnorm_custom
 from allocation import greedy_allocation3, parameters
 from downhill_search import nm, f3wrapper
+from downhill import downhill
 from random import random, randint
 import time
 import logging
@@ -17,6 +18,7 @@ parameters['xtol'] = 1.
 parameters['ftol'] = 0.1
 parameters['numrun'] = 10
 parameters['ncpu'] = 4
+parameters['distribution'] = 'norm'
 
 if __name__ == '__main__':
 
@@ -41,7 +43,10 @@ if __name__ == '__main__':
         result_heu = greedy_allocation3(parameters)
         end_time = time.time()
         heu_time = end_time - start_time
-        logging.debug('Greedy heuristics ended')
+        logging.debug('Greedy heuristics ended with P: {} and allocation {}'.format(result_heu['PROB'],
+                                                                                    str([result_heu['Q1'],
+                                                                                         result_heu['Q2'],
+                                                                                         result_heu['Q3']])))
 
         numrun = parameters['numrun']
         for t in xrange(numrun):
@@ -54,28 +59,13 @@ if __name__ == '__main__':
             nm_time = end_time - start_time
             logging.debug('NM run {} ended'.format(t+1))
 
+            logging.debug('Downhill start')
+            result_downhill = downhill(parameters['funcwrapper'],
+                                       xStart=[parameters['Q1'], parameters['Q2'], parameters['Q3']],
+                                       args=parameters)
+            logging.debug('Downhill end with P: {}'.format(result_downhill['value']))
+
             logging.debug('Create results DF')
-            # df_results.ix[index, 'DATASET'] = row['DATASET']
-            # df_results.ix[index, 'N'] = 3
-            # df_results.ix[index, 'AVAIL'] = parameters['A']
-            # df_results.ix[index, 'TARGET'] = parameters['target']
-            # df_results.ix[index, 'MU1'] = parameters['mu1']
-            # df_results.ix[index, 'MU2'] = parameters['mu2']
-            # df_results.ix[index, 'MU3'] = parameters['mu3']
-            # df_results.ix[index, 'S1'] = parameters['sigma1']
-            # df_results.ix[index, 'S2'] = parameters['sigma2']
-            # df_results.ix[index, 'S3'] = parameters['sigma3']
-            # df_results.ix[index, 'MAX_INTRV'] = row['MAX_INTRV']
-            # df_results.ix[index, 'NM_PROB'] = result_nm.fun
-            # df_results.ix[index, 'NM_TIME'] = nm_time
-            # df_results.ix[index, 'NUM_ITER'] = result_nm.nit
-            # df_results.ix[index, 'FUN_EVAL'] = result_nm.nfev
-            # df_results.ix[index, 'Q1'] = result_nm.x[0]
-            # df_results.ix[index, 'Q2'] = result_nm.x[1]
-            # df_results.ix[index, 'Q3'] = result_nm.x[2]
-            # df_results.ix[index, 'ALLOC_HEU'] = str([result_heu['Q1'], result_heu['Q2'], result_heu['Q3']])
-            # df_results.ix[index, 'HEURISTIC_VALUE'] = result_heu['PROB']
-            # df_results.ix[index, 'HEURISTIC_TIME'] = heu_time
 
             tot = sum(result_nm.x)
             df_run_result = pd.DataFrame([[row['DATASET'],
@@ -106,3 +96,4 @@ if __name__ == '__main__':
     df_results.to_excel('Results.xlsx')
 
     logging.debug('Program complete')
+
