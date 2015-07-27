@@ -122,19 +122,20 @@ def integral(parameters):
         for i in xrange(1, R+1):
             vars()['Q{}'.format(i)] = parameters['Q{}'.format(i)]
 
-    return _integral(rvs=rvs, Q=[vars()['Q{}'.format(i)] for i in xrange(1, R+1)], R, target)
+    return _integral(rvs, [vars()['Q{}'.format(i)] for i in xrange(1, R+1)], R, target)
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def _integral(rvs, Q, R, target):
     hit = 0.
     N = len(rvs[0])
 
-    for t in N:
+    for t in xrange(N):
         if sum([MIN(rvs[i][t], Q[i]) for i in xrange(R)]) >= target:
             hit += 1.
 
     return hit/N
+
 
 
 def f3TruncNormRVSnp(parameters):
