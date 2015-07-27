@@ -118,7 +118,7 @@ def greedy_allocation(parameters):
     for i in xrange(1, R+1):
         parameters['Q{}'.format(i)] = Q[i-1]
 
-    ret = {'Q{}'.format(i): Q[i-1]  for i in xrange(1, R+1)}
+    ret = {'Q{}'.format(i): Q[i-1] for i in xrange(1, R+1)}
     ret['PROB'] = f3TruncNormRVSnp(parameters)
     return ret
 
