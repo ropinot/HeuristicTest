@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 from scipy.optimize import minimize
-from MCIntegrals_numba import f3TruncNormRVSnp
+from MCIntegrals_numba import f3TruncNormRVSnp, integral
+
+
+def integral_wrapper(x0, parameters):
+    R = parameters['retailers']
+    for i in xrange(1, R+1):
+        parameters['Q{}'.format(i)] = x0[i-1]
+
+    return -1. * integral(parameters)
 
 
 def f3wrapper(x0, parameters):
