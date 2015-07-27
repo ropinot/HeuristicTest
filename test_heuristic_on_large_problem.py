@@ -2,7 +2,7 @@
 
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
-from allocation import greedy_allocation3, parameters
+from allocation import greedy_allocation, parameters
 from downhill_search import nm, f3wrapper
 from downhill import downhill
 from random import random, randint
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         logging.debug('Start greedy heuristics')
         logging.debug('Distribution: {}'.format(parameters['distribution']))
         start_time = time.time()
-        result_heu = greedy_allocation3(parameters)
+        result_heu = greedy_allocation(parameters)
         end_time = time.time()
         heu_time = end_time - start_time
         logging.debug('Greedy heuristics ended with P: {} and allocation {}'.format(result_heu['PROB'],
