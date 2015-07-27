@@ -21,10 +21,19 @@ parameters['ncpu'] = 4
 parameters['distribution'] = 'norm'
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Tester')
+    parser.add_argument('-i', action='store', dest='inputfile', type=str, required=True)
+    parser.add_argument('-o', action='store', dest='outputfile', type=str, required=True)
 
-    df = pd.read_excel('Data_alloc_change_on_target_change_comp_NM_large_problem_test.xlsx')
+    args=parser.parse_args()
+    inputfile = args.inputfile
+    outputfile = args.outputfile
+
+    # df = pd.read_excel('Data_alloc_change_on_target_change_comp_NM_large_problem_test.xlsx')
     # df_results = pd.read_excel('Results_alloc_change_on_target_change_comp_NM_large_problem.xlsx')
 
+    df = pd.read_excel(inputfile)
     df_results_columns = [u'DATASET', u'N', u'DIST', u'AVAIL', u'TARGET', u'MU1', u'S1', u'MU2', u'S2', u'MU3', u'S3', u'MIN_INTRV', u'MAX_INTRV', u'NM_PROB', u'NM_TIME', u'NUM_ITER', u'FUN_EVAL', u'Q1', u'Q2', u'Q3', u'ALLOC_HEU', u'HEURISTIC_VALUE', u'HEURISTIC_TIME', u'DOWNHILL_ALLOC', u'DOWNHILL_PROB', u'DOWNHILL_TIME', u'DOWNHILL_ITER', u'DOWNHILL_FUNC']
     df_results = pd.DataFrame(columns=df_results_columns)
 
@@ -108,7 +117,7 @@ if __name__ == '__main__':
             df_results=df_results[df_results_columns]
 
     logging.debug('Write on disk')
-    df_results.to_excel('Results.xlsx')
-
+    # df_results.to_excel('Results.xlsx')
+    df_results.to_excel(outputfile)
     logging.debug('Program complete')
 
