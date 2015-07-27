@@ -16,16 +16,17 @@ parameters['funcwrapper'] = f3wrapper
 parameters['N'] = 200000
 parameters['xtol'] = 1.
 parameters['ftol'] = 0.1
-parameters['numrun'] = 10
+parameters['numrun'] = 1
 parameters['ncpu'] = 4
 parameters['distribution'] = 'norm'
 
 if __name__ == '__main__':
 
     df = pd.read_excel('Data_alloc_change_on_target_change_comp_NM_large_problem_test.xlsx')
-    df_results = pd.read_excel('Results_alloc_change_on_target_change_comp_NM_large_problem.xlsx')
+    # df_results = pd.read_excel('Results_alloc_change_on_target_change_comp_NM_large_problem.xlsx')
 
-    df_results_columns = [u'DATASET', u'N', u'DIST', u'AVAIL', u'TARGET', u'MU1', u'S1', u'MU2', u'S2', u'MU3', u'S3', u'MIN_INTRV', u'MAX_INTRV', u'NM_PROB', u'NM_TIME', u'NUM_ITER', u'FUN_EVAL', u'Q1', u'Q2', u'Q3', u'ALLOC_HEU', u'HEURISTIC_VALUE', u'HEURISTIC_TIME']
+    df_results_columns = [u'DATASET', u'N', u'DIST', u'AVAIL', u'TARGET', u'MU1', u'S1', u'MU2', u'S2', u'MU3', u'S3', u'MIN_INTRV', u'MAX_INTRV', u'NM_PROB', u'NM_TIME', u'NUM_ITER', u'FUN_EVAL', u'Q1', u'Q2', u'Q3', u'ALLOC_HEU', u'HEURISTIC_VALUE', u'HEURISTIC_TIME', u'DOWNHILL_ALLOC', u'DOWNHILL_PROB', u'DOWNHILL_TIME', u'DOWNHILL_ITER', u'DOWNHILL_FUNC']
+    df_results = pd.DataFrame(columns=df_results_columns)
 
     for index, row in df.iterrows():
         # get from excel file
@@ -62,9 +63,13 @@ if __name__ == '__main__':
             logging.debug('NM run {} ended'.format(t+1))
 
             logging.debug('Downhill start')
+            start_time = time.time()
             result_downhill = downhill(parameters['funcwrapper'],
                                        xStart=[parameters['Q1'], parameters['Q2'], parameters['Q3']],
                                        args=parameters)
+            end_time = time.time()
+            downhill_time = end_time - start_time
+
             logging.debug('Downhill end with P: {}'.format(result_downhill['value']))
 
             logging.debug('Create results DF')
@@ -92,7 +97,12 @@ if __name__ == '__main__':
                                           result_nm.x[2]*parameters['A']/tot,
                                           str([result_heu['Q1'], result_heu['Q2'], result_heu['Q3']]),
                                           result_heu['PROB'],
-                                          heu_time]], columns=df_results_columns)
+                                          heu_time,
+                                          str(result_downhill['allocation']),
+                                          result_downhill['value'],
+                                          downhill_time,
+                                          result_downhill['iteration'],
+                                          result_downhill['funcalls']]], columns=df_results_columns)
 
             df_results=df_results.append(df_run_result, ignore_index=True)
             df_results=df_results[df_results_columns]
