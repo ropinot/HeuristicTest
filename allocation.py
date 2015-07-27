@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm, uniform, beta
+from scipy.stats import truncnorm, norm, uniform, beta, triang
 from MCIntegrals_numba import f3TruncNormRVSnp
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
@@ -31,9 +31,9 @@ def greedy_allocation3(parameters):
         rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu2'], scale=parameters['sigma2'])
         rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu3'], scale=parameters['sigma3'])
     elif parameters['distribution'] == 'triang':
-        rv1 = beta(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1'])
-        rv2 = beta(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2'])
-        rv3 = beta(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3'])
+        rv1 = triang(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1'])
+        rv2 = triang(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2'])
+        rv3 = triang(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3'])
     else:
         print 'Distribution not recognized...abort'
         exit(1)

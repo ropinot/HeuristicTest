@@ -104,9 +104,9 @@ def f3TruncNormRVSnp(parameters):
         rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
         rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
     elif parameters['distribution'] == 'triang':
-        rv1 = beta(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1']).rvs(N)
-        rv2 = beta(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2']).rvs(N)
-        rv3 = beta(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3']).rvs(N)
+        rv1 = triang(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1']).rvs(N)
+        rv2 = triang(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2']).rvs(N)
+        rv3 = triang(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3']).rvs(N)
     else:
         print 'Distribution not recognized...abort'
         exit(1)
