@@ -16,19 +16,21 @@ parameters['funcwrapper'] = f3wrapper
 parameters['N'] = 200000
 parameters['xtol'] = 1.
 parameters['ftol'] = 0.1
-parameters['numrun'] = 1
+parameters['numrun'] = 10
 parameters['ncpu'] = 4
-parameters['distribution'] = 'norm'
+
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Tester')
     parser.add_argument('-i', action='store', dest='inputfile', type=str, required=True)
     parser.add_argument('-o', action='store', dest='outputfile', type=str, required=True)
+    parser.add_argument('-n', action='store', dest='numrun', type=int, default=10)
 
     args=parser.parse_args()
     inputfile = args.inputfile
     outputfile = args.outputfile
+    parameters['numrun'] = args.numrun
 
     # df = pd.read_excel('Data_alloc_change_on_target_change_comp_NM_large_problem_test.xlsx')
     # df_results = pd.read_excel('Results_alloc_change_on_target_change_comp_NM_large_problem.xlsx')
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     for index, row in df.iterrows():
         # get from excel file
         logging.debug('Start index {} (dataset {})'.format(index, row['DATASET']))
-
+        parameters['distribution'] = row['DIST']
         parameters['mu1'], parameters['mu2'], parameters['mu3'] = row['MU1'],row['MU2'],row['MU3']
         parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = row['S1'],row['S2'],row['S3']
         parameters['A'] = row['AVAIL']
@@ -64,14 +66,14 @@ if __name__ == '__main__':
         for t in xrange(numrun):
 
             parameters['Q1'], parameters['Q2'], parameters['Q3'] = randint(100, 600), randint(100, 600), randint(100, 600)
-            logging.debug('Start NM run {}'.format(t+1))
+            logging.debug('Start NM run {}/{}'.format(t+1, parameters['numrun']))
             start_time = time.time()
             result_nm = nm(parameters)
             end_time = time.time()
             nm_time = end_time - start_time
             logging.debug('NM run {} ended'.format(t+1))
 
-            logging.debug('Downhill start')
+            logging.debug('Downhill start run {}/{}'.format(t+1, parameters['numrun']))
             start_time = time.time()
             result_downhill = downhill(parameters['funcwrapper'],
                                        xStart=[parameters['Q1'], parameters['Q2'], parameters['Q3']],
@@ -79,7 +81,7 @@ if __name__ == '__main__':
             end_time = time.time()
             downhill_time = end_time - start_time
 
-            logging.debug('Downhill end with P: {}'.format(result_downhill['value']))
+            logging.debug('Downhill run {} end with P: {}'.format(t+1, result_downhill['value']))
 
             logging.debug('Create results DF')
 
