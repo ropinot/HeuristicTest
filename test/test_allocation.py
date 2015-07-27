@@ -1,7 +1,14 @@
-from nose.tools import assert_equal, assert_almost_equal
+from nose.tools import assert_equal, assert_almost_equals
 from ..allocation import greedy_allocation, parameters
+from ..MCIntegrals_numba import integral, f3TruncNormRVSnp
+from random import randint
+
 
 def test_greedy_allocation():
+    """
+    Test the greedy_heuristic() with 3 and 4 retailers
+    """
+
     parameters['A'] = 600
     parameters['mu1'], parameters['mu2'], parameters['mu3'] = 250., 250., 250.
     parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 25., 25., 25.
@@ -52,3 +59,25 @@ def test_greedy_allocation():
     assert_equal(r['Q2'], 480)
     assert_equal(r['Q3'], 620)
     assert_equal(r['Q4'], 760)
+
+
+def test_integral():
+    """
+    Test the integral() function with 3 retailers
+    """
+    epsilon = 0.005
+    parameters['A'] = 1200
+    parameters['target'] = 1000
+    parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = 400., 300., 300., 300.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = 190., 190., 190., 190.
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 3
+
+    # assert_almost_equals(f3TruncNormRVSnp(parameters), integral(parameters), places=2)
+    assert abs(f3TruncNormRVSnp(parameters) - integral(parameters)) <= epsilon
+
+    for i in xrange(10):
+        parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = [randint(250, 400)] * 4
+        parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = [randint(50, 200)] * 4
+        # assert_almost_equals(f3TruncNormRVSnp(parameters), integral(parameters), places=2)
+        assert abs(f3TruncNormRVSnp(parameters) - integral(parameters)) <= epsilon
