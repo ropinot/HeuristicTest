@@ -42,3 +42,13 @@ def test_greedy_allocation():
     assert_equal(r['Q3'], 241)
     assert_equal(r['Q4'], 249)
 
+    parameters['A'] = 2200
+    parameters['target'] = 1800
+    parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = 300., 400., 500., 600.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = 90., 180., 270., 360
+    parameters['distribution'] = 'norm'
+    r = greedy_allocation(parameters)
+    assert_equal(r['Q1'], 340)
+    assert_equal(r['Q2'], 480)
+    assert_equal(r['Q3'], 620)
+    assert_equal(r['Q4'], 760)
