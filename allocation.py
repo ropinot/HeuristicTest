@@ -41,7 +41,7 @@ def greedy_allocation3(parameters):
     A = parameters['A']
     Q = {i: 0 for i in xrange(3)}
 
-    while A >= 0:
+    while A > 0:
         best_probability = -1
         best_retailer = -1
         for n, r in enumerate([rv1, rv2, rv3]):
@@ -61,6 +61,66 @@ def greedy_allocation3(parameters):
             'Q2': Q[1],
             'Q3': Q[2],
             'PROB': f3TruncNormRVSnp(parameters)}
+
+
+def greedy_allocation(parameters):
+    """
+    Greedy heuristic for 3 supplier (the same as heu_allocation3 but with different parameters)
+    Does not write on the file but returns the solution
+    :param df: dataframe containing the data from the excel file
+    :param parameters: parameters dict
+    :return: write o the df and save on the file
+    """
+    # Number of retailers
+    R = parameters['retailers']
+
+    if not parameters['distribution']:
+        print 'No distribution set...abort'
+        exit(1)
+    elif parameters['distribution'] == 'truncnorm':
+        rvs = [truncnorm_custom(parameters['min_intrv{}'.format(i)],
+                                parameters['max_intrv{}'.format(i)],
+                                parameters['mu{}'.format(i)],
+                                parameters['sigma{}'.format(i)]) for i in xrange(1, R+1)]
+
+    elif parameters['distribution'] == 'norm':
+        rvs = [norm(parameters['mu{}'.format(i)],
+                    parameters['sigma{}'.format(i)]) for i in xrange(1, R+1)]
+
+    elif parameters['distribution'] == 'uniform':
+        rvs = [uniform(loc=parameters['mu{}'.format(i)],
+                       scale=parameters['sigma{}'.format(i)]) for i in xrange(1, R+1)]
+
+    elif parameters['distribution'] == 'triang':
+        rvs = [triang(loc=parameters['min_intrv{}'.format(i)],
+                      scale=parameters['max_intrv{}'.format(i)],
+                      c=parameters['mu{}'.format(i)]) for i in xrange(1, R+1)]
+
+    else:
+        print 'Distribution not recognized...abort'
+        exit(1)
+
+    A = parameters['A']
+    Q = {i: 0 for i in xrange(R)}
+
+    while A > 0:
+        best_probability = -1
+        best_retailer = -1
+        for n, r in enumerate(rvs):
+            p = 1 - r.cdf(Q[n]+1)
+            if p > best_probability:
+                best_probability = p
+                best_retailer = n
+
+        Q[best_retailer] += 1
+        A -= 1
+
+    for i in xrange(1, R+1):
+        parameters['Q{}'.format(i)] = Q[i-1]
+
+    ret = {'Q{}'.format(i): Q[i-1]  for i in xrange(1, R+1)}
+    ret['PROB'] = f3TruncNormRVSnp(parameters)
+    return ret
 
 
 def heu_allocation3(df, parameters):
