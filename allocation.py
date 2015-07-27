@@ -77,11 +77,11 @@ def greedy_allocation(parameters):
     if not parameters['distribution']:
         print 'No distribution set...abort'
         exit(1)
-    elif parameters['distribution'] == 'truncnorm':
-        rvs = [truncnorm_custom(parameters['min_intrv{}'.format(i)],
-                                parameters['max_intrv{}'.format(i)],
-                                parameters['mu{}'.format(i)],
-                                parameters['sigma{}'.format(i)]) for i in xrange(1, R+1)]
+    # elif parameters['distribution'] == 'truncnorm':
+    #     rvs = [truncnorm_custom(parameters['min_intrv{}'.format(i)],
+    #                             parameters['max_intrv{}'.format(i)],
+    #                             parameters['mu{}'.format(i)],
+    #                             parameters['sigma{}'.format(i)]) for i in xrange(1, R+1)]
 
     elif parameters['distribution'] == 'norm':
         rvs = [norm(parameters['mu{}'.format(i)],
