@@ -69,6 +69,74 @@ def ABS(a):
     return a if a > 0.0 else -a
 
 
+def integral(parameters):
+    N = parameters['N']
+    target = parameters['target']
+    R = parameters['retailers']
+    # rv1, rv2, rv3 = ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float)
+    if not parameters['distribution']:
+        print 'No distribution set...abort'
+        exit(1)
+    # elif parameters['distribution'] == 'truncnorm':
+    #     a1, b1 = (parameters['min_intrv1'] - parameters['mu1']) / parameters['sigma1'], (parameters['max_intrv1'] - parameters['mu1']) / parameters['sigma1']
+    #     a2, b2 = (parameters['min_intrv2'] - parameters['mu2']) / parameters['sigma2'], (parameters['max_intrv2'] - parameters['mu2']) / parameters['sigma2']
+    #     a3, b3 = (parameters['min_intrv3'] - parameters['mu3']) / parameters['sigma3'], (parameters['max_intrv3'] - parameters['mu3']) / parameters['sigma3']
+    #     rv1 = truncnorm(a1, b1, loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+    #     rv2 = truncnorm(a2, b2, loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+    #     rv3 = truncnorm(a3, b3, loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+    elif parameters['distribution'] == 'norm':
+        rvs = [norm(parameters['mu{}'.format(i)],
+                    parameters['sigma{}'.format(i)]).rvs(N) for i in xrange(1, R+1)]
+
+    elif parameters['distribution'] == 'uniform':
+        rvs = [uniform(loc=parameters['mu{}'.format(i)],
+                       scale=parameters['sigma{}'.format(i)]).rvs(N) for i in xrange(1, R+1)]
+
+    elif parameters['distribution'] == 'triang':
+        rvs = [triang(loc=parameters['min_intrv{}'.format(i)],
+                      scale=parameters['max_intrv{}'.format(i)],
+                      c=parameters['mu{}'.format(i)]).rvs(N) for i in xrange(1, R+1)]
+
+    else:
+        print 'Distribution not recognized...abort'
+        exit(1)
+
+    if parameters['scaling']:
+        #scale the values of Qs in the allowed range such that sum(Q_i) = A
+        r = sum([ABS(parameters['Q{}'.format(i)]) for i in xrange(1, R+1)])
+        if r == 0.0:
+            r = 1.
+
+        # rounding the values, the sum could exceed A
+        tot_other_Q = 0.0
+        #  set the first R-1 varibles
+        for i in xrange(1, R):
+            vars()['Q{}'.format(i)] = ABS(parameters['Q{}'.format(i)]) * parameters['A'] / r
+            tot_other_Q += vars()['Q{}'.format(i)]
+
+        #  set the R-th variable by difference
+        vars()['Q{}'.format(R)] = parameters['A'] - tot_other_Q
+
+    else:
+        # print "scaling = False"
+        for i in xrange(1, R+1):
+            vars()['Q{}'.format(i)] = parameters['Q{}'.format(i)]
+
+    return _integral(rvs=rvs, Q=[vars()['Q{}'.format(i)] for i in xrange(1, R+1)], R, target)
+
+
+@jit(nopython=True)
+def _integral(rvs, Q, R, target):
+    hit = 0.
+    N = len(rvs[0])
+
+    for t in N:
+        if sum([MIN(rvs[i][t], Q[i]) for i in xrange(R)]) >= target:
+            hit += 1.
+
+    return hit/N
+
+
 def f3TruncNormRVSnp(parameters):
     N = parameters['N']
     target = parameters['target']
