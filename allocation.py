@@ -23,13 +23,17 @@ def greedy_allocation3(parameters):
         rv2 = norm(parameters['mu2'], parameters['sigma2'])
         rv3 = norm(parameters['mu3'], parameters['sigma3'])
     elif parameters['distribution'] == 'uniform':
-        rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2'])
-        rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3'])
-        rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1'])
+        rv1 = uniform(loc=parameters['mu1'], scale=parameters['sigma1'])
+        rv2 = uniform(loc=parameters['mu2'], scale=parameters['sigma2'])
+        rv3 = uniform(loc=parameters['mu3'], scale=parameters['sigma3'])
     elif parameters['distribution'] == 'beta':
-        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu2'], scale=parameters['sigma2'])
-        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu3'], scale=parameters['sigma3'])
-        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu1'], scale=parameters['sigma1'])
+        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu1'], scale=parameters['sigma1'])
+        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu2'], scale=parameters['sigma2'])
+        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu3'], scale=parameters['sigma3'])
+    elif parameters['distribution'] == 'triang':
+        rv1 = beta(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1'])
+        rv2 = beta(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2'])
+        rv3 = beta(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3'])
     else:
         print 'Distribution not recognized...abort'
         exit(1)
@@ -123,13 +127,13 @@ parameters = {'Q1': 1.,
               'Q2': 1.,
               'Q3': 1.,
               'mu1': 30.,  # for the uniform ditribution, mu = a, mu+sigma=b
-              'mu2': 70.,
+              'mu2': 70.,  # for the triang distribution mu = mode
               'mu3': 15.,
-              'sigma1': 15.,
+              'sigma1': 15., # sigma not used for the triang distribution
               'sigma2': 35.,
               'sigma3': 7.5,
               'min_intrv1': 0., # for the beta ditribution, min_intrv=a, max_intrv=b
-              'min_intrv2': 0.,
+              'min_intrv2': 0., # for the triang distribution min_intrv=a, max_intrv=b
               'min_intrv3': 0.,
               'max_intrv1': 100.,
               'max_intrv2': 100.,

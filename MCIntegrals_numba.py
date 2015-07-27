@@ -1,4 +1,4 @@
-from scipy.stats import truncnorm, norm, uniform, beta
+from scipy.stats import truncnorm, norm, uniform, beta, triang
 from numpy import ndarray, min
 from numba import jit
 from math import trunc
@@ -88,21 +88,25 @@ def f3TruncNormRVSnp(parameters):
         a1, b1 = (parameters['min_intrv1'] - parameters['mu1']) / parameters['sigma1'], (parameters['max_intrv1'] - parameters['mu1']) / parameters['sigma1']
         a2, b2 = (parameters['min_intrv2'] - parameters['mu2']) / parameters['sigma2'], (parameters['max_intrv2'] - parameters['mu2']) / parameters['sigma2']
         a3, b3 = (parameters['min_intrv3'] - parameters['mu3']) / parameters['sigma3'], (parameters['max_intrv3'] - parameters['mu3']) / parameters['sigma3']
+        rv1 = truncnorm(a1, b1, loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
         rv2 = truncnorm(a2, b2, loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
         rv3 = truncnorm(a3, b3, loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
-        rv1 = truncnorm(a1, b1, loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
     elif parameters['distribution'] == 'norm':
-        rv1 = norm(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
-        rv2 = norm(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
-        rv3 = norm(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv1 = norm(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv2 = norm(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv3 = norm(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
     elif parameters['distribution'] == 'uniform':
-        rv1 = uniform(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
-        rv2 = uniform(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
-        rv3 = uniform(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv1 = uniform(loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv2 = uniform(loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv3 = uniform(loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
     elif parameters['distribution'] == 'beta':
-        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
-        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
-        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv1 = beta(a=parameters['min_intrv1'], b=parameters['max_intrv1'], loc=parameters['mu1'], scale=parameters['sigma1']).rvs(N)
+        rv2 = beta(a=parameters['min_intrv2'], b=parameters['max_intrv2'], loc=parameters['mu2'], scale=parameters['sigma2']).rvs(N)
+        rv3 = beta(a=parameters['min_intrv3'], b=parameters['max_intrv3'], loc=parameters['mu3'], scale=parameters['sigma3']).rvs(N)
+    elif parameters['distribution'] == 'triang':
+        rv1 = beta(loc=parameters['min_intrv1'], scale=parameters['max_intrv1'], c=parameters['mu1']).rvs(N)
+        rv2 = beta(loc=parameters['min_intrv2'], scale=parameters['max_intrv2'], c=parameters['mu2']).rvs(N)
+        rv3 = beta(loc=parameters['min_intrv3'], scale=parameters['max_intrv3'], c=parameters['mu3']).rvs(N)
     else:
         print 'Distribution not recognized...abort'
         exit(1)
