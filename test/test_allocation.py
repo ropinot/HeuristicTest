@@ -211,7 +211,8 @@ def test_integral_9():
     v = integral(parameters)
     assert abs(v - 0.00096) <= epsilon
 
-def test_downhill_vs_greedy():
+
+def test_downhill_vs_greedy_3():
     """
     Test the difference between the downhill and the greedy on 3 retailers
     """
@@ -230,6 +231,29 @@ def test_downhill_vs_greedy():
     downhill = nm(parameters)
 
     assert abs(greedy['PROB'] + downhill.fun) <= epsilon
+
+
+def test_downhill_vs_greedy_6():
+    """
+    Test the difference between the downhill and the greedy on 6 retailers
+    """
+    epsilon = 0.005
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 350., 250., 400.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 350., 250., 400.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 120., 90., 200.
+    parameters['sigma4'], parameters['sigma5'], parameters['sigma6'] = 120., 90., 200.
+    parameters['A'] = 3000
+    parameters['target'] = 2000
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 6
+    parameters['funcwrapper'] = integral_wrapper
+    parameters['numrun'] = 1
+    parameters['scaling'] = True
+
+    greedy = greedy_allocation(parameters)
+    downhill = nm(parameters)
+
+    assert abs(greedy['PROB'] + downhill.fun) <= epsilon # greedy vs downhill 6
 
 
 def test_downhill():
