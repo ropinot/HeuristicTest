@@ -1,5 +1,5 @@
 from scipy.stats import truncnorm, norm, uniform, beta, triang
-from MCIntegrals_numba import f3TruncNormRVSnp
+from MCIntegrals_numba import f3TruncNormRVSnp, integral
 import pandas as pd
 from truncnorm_custom import truncnorm_custom
 
@@ -119,7 +119,7 @@ def greedy_allocation(parameters):
         parameters['Q{}'.format(i)] = Q[i-1]
 
     ret = {'Q{}'.format(i): Q[i-1] for i in xrange(1, R+1)}
-    ret['PROB'] = f3TruncNormRVSnp(parameters)
+    ret['PROB'] = integral(parameters)
     return ret
 
 
