@@ -73,6 +73,7 @@ def integral(parameters):
     N = parameters['N']
     target = parameters['target']
     R = parameters['retailers']
+
     # rv1, rv2, rv3 = ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float), ndarray(shape = (N,), dtype=float)
     if not parameters['distribution']:
         print 'No distribution set...abort'
@@ -111,18 +112,32 @@ def integral(parameters):
         tot_other_Q = 0.0
         #  set the first R-1 varibles
         for i in xrange(1, R):
-            vars()['Q{}'.format(i)] = ABS(parameters['Q{}'.format(i)]) * parameters['A'] / r
-            tot_other_Q += vars()['Q{}'.format(i)]
+            parameters['Q{}'.format(i)] = ABS(parameters['Q{}'.format(i)]) * parameters['A'] / r
+            tot_other_Q += parameters['Q{}'.format(i)]
 
         #  set the R-th variable by difference
-        vars()['Q{}'.format(R)] = parameters['A'] - tot_other_Q
+        parameters['Q{}'.format(R)] = parameters['A'] - tot_other_Q
 
+    if parameters['retailers'] == 3:
+        return _integral3(rvs[0], rvs[1], rvs[2],
+                          parameters['Q1'], parameters['Q2'], parameters['Q3'], target)
+    elif parameters['retailers'] == 6:
+        return _integral6(rvs[0], rvs[1], rvs[2],
+                          rvs[3], rvs[4], rvs[5],
+                          parameters['Q1'], parameters['Q2'], parameters['Q3'],
+                          parameters['Q4'], parameters['Q5'], parameters['Q6'], target)
+    elif parameters['retailers'] == 9:
+        return _integral9(rvs[0], rvs[1], rvs[2],
+                          rvs[3], rvs[4], rvs[5],
+                          rvs[6], rvs[7], rvs[8],
+                          parameters['Q1'], parameters['Q2'], parameters['Q3'],
+                          parameters['Q4'], parameters['Q5'], parameters['Q6'],
+                          parameters['Q7'], parameters['Q8'], parameters['Q9'], target)
     else:
-        # print "scaling = False"
-        for i in xrange(1, R+1):
-            vars()['Q{}'.format(i)] = parameters['Q{}'.format(i)]
+        print "Not implemented with {} retailers".format(parameters['retailers'])
+        exit(1)
 
-    return _integral(rvs, [vars()['Q{}'.format(i)] for i in xrange(1, R+1)], R, target)
+    # return _integral(rvs, [vars()['Q{}'.format(i)] for i in xrange(1, R+1)], R, target)
 
 
 # @jit(nopython=True)
@@ -136,6 +151,40 @@ def _integral(rvs, Q, R, target):
 
     return hit/N
 
+
+@jit(nopython=True)
+def _integral3(rv1, rv2, rv3, Q1, Q2, Q3, target):
+    hit = 0.
+    N = len(rv1)
+    for i in xrange(N):
+        if MIN(rv1[i], Q1) + MIN(rv2[i], Q2) + MIN(rv3[i], Q3) >= target:
+            hit += 1.
+
+    return hit/N
+
+
+@jit(nopython=True)
+def _integral6(rv1, rv2, rv3, rv4, rv5, rv6, Q1, Q2, Q3, Q4, Q5, Q6, target):
+    hit = 0.
+    N = len(rv1)
+    for i in xrange(N):
+        if MIN(rv1[i], Q1) + MIN(rv2[i], Q2) + MIN(rv3[i], Q3) + MIN(rv4[i], Q4) + MIN(rv5[i], Q5) + MIN(rv6[i], Q6) >= target:
+            hit += 1.
+
+    return hit/N
+
+
+@jit(nopython=True)
+def _integral9(rv1, rv2, rv3, rv4, rv5, rv6, rv7, rv8, rv9, Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, target):
+    hit = 0.
+    N = len(rv1)
+    for i in xrange(N):
+        if MIN(rv1[i], Q1) + MIN(rv2[i], Q2) + MIN(rv3[i], Q3) +\
+           MIN(rv4[i], Q4) + MIN(rv5[i], Q5) + MIN(rv6[i], Q6) +\
+           MIN(rv7[i], Q7) + MIN(rv8[i], Q8) + MIN(rv9[i], Q9) >= target:
+            hit += 1.
+
+    return hit/N
 
 
 def f3TruncNormRVSnp(parameters):
