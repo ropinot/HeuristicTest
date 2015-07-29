@@ -24,9 +24,10 @@ def nm(parameters):
     :param parameters:
     :return:
     """
-    x0 = [parameters['Q{}'.format(i)] for i in xrange(1, 4)]
+    R = parameters['retailers']
+    x0 = [parameters['Q{}'.format(i)] for i in xrange(1, R+1)]
     print "Start search with:"
-    for t in xrange(1, 4):
+    for t in xrange(1, R+1):
         print "Q{}: {}".format(t, x0[t-1])
 
     res = minimize(parameters['funcwrapper'], x0, args=parameters, method='Nelder-Mead',
