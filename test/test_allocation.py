@@ -1,7 +1,7 @@
 from nose.tools import assert_equal
 from ..allocation import greedy_allocation, parameters
 from ..MCIntegrals_numba import integral, f3TruncNormRVSnp
-from random import randint
+from random import randint, random
 from ..downhill_search import nm, integral_wrapper
 
 
@@ -244,10 +244,42 @@ def test_downhill():
     parameters['distribution'] = 'norm'
     parameters['retailers'] = 3
     parameters['funcwrapper'] = integral_wrapper
-    parameters['numrun'] = 1
+    parameters['numrun'] = 10
     parameters['scaling'] = True
     parameters['xtol'] = 1.
-    parameters['ftol'] = 0.1
+    parameters['ftol'] = 0.01
+
+    parameters['Q1'] = 100.
+    parameters['Q2'] = 200.
+    parameters['Q3'] = 300.
 
     downhill = nm(parameters)
-    assert abs( 0.888685 + downhill.fun) <= epsilon
+    assert abs(0.888685 + downhill.fun) <= epsilon # T=950
+
+    parameters['target'] = 1050
+    downhill = nm(parameters)
+    assert abs(0.665920 + downhill.fun) <= epsilon # T=1050
+
+    best_p = 0.0
+    for t in xrange(parameters['numrun']):
+        parameters['Q1'], parameters['Q2'], parameters['Q3'] = random(), random(), random()
+        parameters['target'] = 1050
+        downhill = nm(parameters)
+        if downhill.fun < best_p:
+            best_p = downhill.fun
+
+    assert abs(0.665920 + best_p) <= epsilon # T=1050 random
+
+    # parameters['target'] = 1150
+    # downhill = nm(parameters)
+    # assert abs(0.299545 + downhill.fun) <= epsilon # T=1150
+
+    best_p = 0.0
+    for t in xrange(parameters['numrun']):
+        parameters['Q1'], parameters['Q2'], parameters['Q3'] = random(), random(), random()
+        parameters['target'] = 1150
+        downhill = nm(parameters)
+        if downhill.fun < best_p:
+            best_p = downhill.fun
+
+    assert abs(0.299545 + best_p) <= epsilon # T=1150 random
