@@ -1,18 +1,20 @@
-from nose.tools import assert_equal, assert_almost_equals
+from nose.tools import assert_equal
 from ..allocation import greedy_allocation, parameters
 from ..MCIntegrals_numba import integral, f3TruncNormRVSnp
 from random import randint
+from ..downhill_search import nm, integral_wrapper
 
 
 def test_greedy_allocation():
     """
-    Test the greedy_heuristic() with 3 and 4 retailers
+    Test the greedy_heuristic() with 3, 4 and 5 retailers
     """
 
     parameters['A'] = 600
     parameters['mu1'], parameters['mu2'], parameters['mu3'] = 250., 250., 250.
     parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 25., 25., 25.
     parameters['distribution'] = 'norm'
+    parameters['scaling'] = True
 
     r = greedy_allocation(parameters)
     assert_equal(r['Q1'], 200)
@@ -60,8 +62,20 @@ def test_greedy_allocation():
     assert_equal(r['Q3'], 620)
     assert_equal(r['Q4'], 760)
 
+    parameters['A'] = 2200
+    parameters['target'] = 1800
+    parameters['mu5'] = 700.
+    parameters['sigma5'] = 450.
+    parameters['retailers'] = 5
+    r = greedy_allocation(parameters)
+    assert_equal(r['Q1'], 280)
+    assert_equal(r['Q2'], 360)
+    assert_equal(r['Q3'], 440)
+    assert_equal(r['Q4'], 520)
+    assert_equal(r['Q5'], 600)
 
-def test_integral():
+
+def test_integral_3():
     """
     Test the integral() function with 3 retailers
     """
@@ -72,12 +86,168 @@ def test_integral():
     parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = 190., 190., 190., 190.
     parameters['distribution'] = 'norm'
     parameters['retailers'] = 3
+    parameters['scaling'] = True
 
-    # assert_almost_equals(f3TruncNormRVSnp(parameters), integral(parameters), places=2)
-    assert abs(f3TruncNormRVSnp(parameters) - integral(parameters)) <= epsilon
+    v1 = f3TruncNormRVSnp(parameters)
+    v2 = integral(parameters)
+    assert abs(v1 - v2) <= epsilon
 
     for i in xrange(10):
-        parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = [randint(250, 400)] * 4
-        parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = [randint(50, 200)] * 4
-        # assert_almost_equals(f3TruncNormRVSnp(parameters), integral(parameters), places=2)
-        assert abs(f3TruncNormRVSnp(parameters) - integral(parameters)) <= epsilon
+        parameters['mu1'], parameters['mu2'], parameters['mu3'] = [randint(250, 400)] * 3
+        parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = [randint(50, 200)] * 3
+        v1 = f3TruncNormRVSnp(parameters)
+        v2 = integral(parameters)
+        assert abs(v1 - v2) <= epsilon
+
+
+def test_integral_6():
+    """
+    Test the integral() function with 6 retailers
+    """
+    epsilon = 0.005
+    parameters['A'] = 2200
+    parameters['target'] = 1500
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 400., 300., 300.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 400., 300., 300.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 190., 190., 190.
+    parameters['sigma4'], parameters['sigma5'], parameters['sigma6'] = 190., 190., 190.
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 6
+    parameters['scaling'] = False
+    parameters['Q1'] = 300.
+    parameters['Q2'] = 300.
+    parameters['Q3'] = 300.
+    parameters['Q4'] = 300.
+    parameters['Q5'] = 300.
+    parameters['Q6'] = 300.
+    v = integral(parameters)
+    assert abs(v - 0.43182) <= epsilon
+
+    parameters['target'] = 1000
+    v = integral(parameters)
+    assert abs(v - 0.93976) <= epsilon
+
+    parameters['target'] = 3000.
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 300., 400., 500.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 600., 700., 800.
+    parameters['Q1'] = 500.
+    parameters['Q2'] = 600.
+    parameters['Q3'] = 500.
+    parameters['Q4'] = 500.
+    parameters['Q5'] = 600.
+    parameters['Q6'] = 700.
+    v = integral(parameters)
+    assert abs(v - 0.24906) <= epsilon
+
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 90., 190., 290.
+    parameters['sigma4'], parameters['sigma5'], parameters['sigma6'] = 290., 190., 90.
+    parameters['Q1'] = 500.
+    parameters['Q2'] = 600.
+    parameters['Q3'] = 500.
+    parameters['Q4'] = 500.
+    parameters['Q5'] = 600.
+    parameters['Q6'] = 700.
+    v = integral(parameters)
+    assert abs(v - 0.21608) <= epsilon
+
+
+def test_integral_9():
+    """
+    Test the integral() function with 9 retailers
+    """
+    epsilon = 0.005
+    parameters['target'] = 5000
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 300., 400., 500.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 600., 700., 800.
+    parameters['mu7'], parameters['mu8'], parameters['mu9'] = 600., 700., 800.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 90., 190., 290.
+    parameters['sigma4'], parameters['sigma5'], parameters['sigma6'] = 290., 190., 90.
+    parameters['sigma7'], parameters['sigma8'], parameters['sigma9'] = 290., 190., 90.
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 9
+    parameters['N'] = 200000
+    parameters['scaling'] = False
+    parameters['Q1'] = 500.
+    parameters['Q2'] = 600.
+    parameters['Q3'] = 500.
+    parameters['Q4'] = 500.
+    parameters['Q5'] = 600.
+    parameters['Q6'] = 700.
+    parameters['Q7'] = 500.
+    parameters['Q8'] = 600.
+    parameters['Q9'] = 700.
+
+    v = integral(parameters)
+    assert abs(v - 0.0211) <= epsilon
+
+    parameters['target'] = 2000
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 300., 300., 300.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 300., 300., 300.
+    parameters['mu7'], parameters['mu8'], parameters['mu9'] = 300., 300., 300.
+    parameters['Q1'] = 500.
+    parameters['Q2'] = 600.
+    parameters['Q3'] = 500.
+    parameters['Q4'] = 500.
+    parameters['Q5'] = 600.
+    parameters['Q6'] = 700.
+    parameters['Q7'] = 500.
+    parameters['Q8'] = 600.
+    parameters['Q9'] = 700.
+
+    v = integral(parameters)
+    assert abs(v - 0.851235) <= epsilon
+
+    parameters['target'] = 4000
+    parameters['Q1'] = 500.
+    parameters['Q2'] = 600.
+    parameters['Q3'] = 500.
+    parameters['Q4'] = 500.
+    parameters['Q5'] = 600.
+    parameters['Q6'] = 700.
+    parameters['Q7'] = 500.
+    parameters['Q8'] = 600.
+    parameters['Q9'] = 700.
+
+    v = integral(parameters)
+    assert abs(v - 0.00096) <= epsilon
+
+def test_downhill_vs_greedy():
+    """
+    Test the difference between the downhill and the greedy on 3 retailers
+    """
+    epsilon = 0.005
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 350., 250., 400.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 120., 90., 200.
+    parameters['A'] = 1500
+    parameters['target'] = 1000
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 3
+    parameters['funcwrapper'] = integral_wrapper
+    parameters['numrun'] = 1
+    parameters['scaling'] = True
+
+    greedy = greedy_allocation(parameters)
+    downhill = nm(parameters)
+
+    assert abs(greedy['PROB'] + downhill.fun) <= epsilon
+
+
+def test_downhill():
+    """
+    Test downhill on same retailers
+    """
+    epsilon = 0.005
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 400., 400., 400.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 100., 100., 100.
+    parameters['A'] = 1200
+    parameters['target'] = 950
+    parameters['distribution'] = 'norm'
+    parameters['retailers'] = 3
+    parameters['funcwrapper'] = integral_wrapper
+    parameters['numrun'] = 1
+    parameters['scaling'] = True
+    parameters['xtol'] = 1.
+    parameters['ftol'] = 0.1
+
+    downhill = nm(parameters)
+    assert abs( 0.888685 + downhill.fun) <= epsilon
