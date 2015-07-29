@@ -1,20 +1,35 @@
-from nose.tools import assert_equal
+from nose.tools import assert_equal, with_setup
 from ..allocation import greedy_allocation, parameters
 from ..MCIntegrals_numba import integral, f3TruncNormRVSnp
 from random import randint, random
 from ..downhill_search import nm, integral_wrapper
 
-
-def test_greedy_allocation():
-    """
-    Test the greedy_heuristic() with 3, 4 and 5 retailers
-    """
-
+def setup_func():
+    "set up test fixtures"
     parameters['A'] = 600
     parameters['mu1'], parameters['mu2'], parameters['mu3'] = 250., 250., 250.
     parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 25., 25., 25.
     parameters['distribution'] = 'norm'
     parameters['scaling'] = True
+    parameters['retailers'] = 3
+
+
+def teardown_func():
+    "tear down test fixtures"
+
+# Just for the sake of example, use setup and teardown function
+@with_setup(setup_func, teardown_func)
+def test_greedy_allocation_3():
+    """
+    Test the greedy_heuristic() with 3 retailers
+    """
+
+    # parameters['A'] = 600
+    # parameters['mu1'], parameters['mu2'], parameters['mu3'] = 250., 250., 250.
+    # parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 25., 25., 25.
+    # parameters['distribution'] = 'norm'
+    # parameters['scaling'] = True
+    # parameters['retailers'] = 3
 
     r = greedy_allocation(parameters)
     assert_equal(r['Q1'], 200)
@@ -42,37 +57,66 @@ def test_greedy_allocation():
     assert_equal(r['Q3'], 285)
 
     # add one retailer
-    parameters['mu4'] = 300.
-    parameters['sigma4'] = 150.
-    parameters['retailers'] = 4
-    r = greedy_allocation(parameters)
-    assert_equal(r['Q1'], 469)
-    assert_equal(r['Q2'], 241)
-    assert_equal(r['Q3'], 241)
-    assert_equal(r['Q4'], 249)
+    # parameters['mu4'] = 300.
+    # parameters['sigma4'] = 150.
+    # parameters['retailers'] = 4
+    # r = greedy_allocation(parameters)
+    # assert_equal(r['Q1'], 469)
+    # assert_equal(r['Q2'], 241)
+    # assert_equal(r['Q3'], 241)
+    # assert_equal(r['Q4'], 249)
+    #
+    # parameters['A'] = 2200
+    # parameters['target'] = 1800
+    # parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = 300., 400., 500., 600.
+    # parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = 90., 180., 270., 360
+    # parameters['distribution'] = 'norm'
+    # r = greedy_allocation(parameters)
+    # assert_equal(r['Q1'], 340)
+    # assert_equal(r['Q2'], 480)
+    # assert_equal(r['Q3'], 620)
+    # assert_equal(r['Q4'], 760)
+    #
+    # parameters['A'] = 2200
+    # parameters['target'] = 1800
+    # parameters['mu5'] = 700.
+    # parameters['sigma5'] = 450.
+    # parameters['retailers'] = 5
+    # r = greedy_allocation(parameters)
+    # assert_equal(r['Q1'], 280)
+    # assert_equal(r['Q2'], 360)
+    # assert_equal(r['Q3'], 440)
+    # assert_equal(r['Q4'], 520)
+    # assert_equal(r['Q5'], 600)
 
-    parameters['A'] = 2200
-    parameters['target'] = 1800
-    parameters['mu1'], parameters['mu2'], parameters['mu3'], parameters['mu4'] = 300., 400., 500., 600.
-    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'], parameters['sigma4'] = 90., 180., 270., 360
+
+def test_greedy_allocation_6():
+    """
+    Test the greedy_heuristic() with 6 retailers
+    """
+
+    parameters['A'] = 1200
+    parameters['mu1'], parameters['mu2'], parameters['mu3'] = 250., 250., 250.
+    parameters['mu4'], parameters['mu5'], parameters['mu6'] = 250., 250., 250.
+    parameters['sigma1'], parameters['sigma2'], parameters['sigma3'] = 25., 25., 25.
+    parameters['sigma4'], parameters['sigma5'], parameters['sigma6'] = 25., 25., 25.
     parameters['distribution'] = 'norm'
-    r = greedy_allocation(parameters)
-    assert_equal(r['Q1'], 340)
-    assert_equal(r['Q2'], 480)
-    assert_equal(r['Q3'], 620)
-    assert_equal(r['Q4'], 760)
+    parameters['scaling'] = True
+    parameters['retailers'] = 6
 
-    parameters['A'] = 2200
-    parameters['target'] = 1800
-    parameters['mu5'] = 700.
-    parameters['sigma5'] = 450.
-    parameters['retailers'] = 5
     r = greedy_allocation(parameters)
-    assert_equal(r['Q1'], 280)
-    assert_equal(r['Q2'], 360)
-    assert_equal(r['Q3'], 440)
-    assert_equal(r['Q4'], 520)
-    assert_equal(r['Q5'], 600)
+    for i in xrange(parameters['retailers']):
+        assert r['Q{}'.format(i+1)] == 200.
+
+    # TODO: check why the greedy heuristics does not assign the availability evenly
+    # parameters['A'] = 6000
+    # parameters['mu1'], parameters['mu2'], parameters['mu3'] = 500., 500., 500.
+    # parameters['mu4'], parameters['mu5'], parameters['mu6'] = 500., 500., 500.
+    # r = greedy_allocation(parameters)
+    # for i in xrange(parameters['retailers']):
+    #     print r['Q{}'.format(i+1)]
+    # for i in xrange(parameters['retailers']):
+    #     assert r['Q{}'.format(i+1)] == 1000.
 
 
 def test_integral_3():
